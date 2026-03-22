@@ -1,43 +1,3 @@
-require('dotenv').config();
-
-const express = require('express');
-const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-
-const authRoutes = require('./routes/auth');
-const taskRoutes = require('./routes/tasks');
-const analyticsRoutes = require('./routes/analytics');
-const timerRoutes = require('./routes/timers');
-const { errorHandler, notFound } = require('./middleware/error');
-
-const app = express();
-
-
-// ================= SECURITY =================
-
-app.use(helmet());
-
-
-// ================= RATE LIMIT =================
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200
-});
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20
-});
-
-app.use('/api/auth', authLimiter);
-app.use(limiter);
-
-
 // ================= CORS FIX =================
 
 // domains allowed to call backend
@@ -46,106 +6,27 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
-app.use(cors({
-
+const corsOptions = {
   origin: function (origin, callback) {
 
-    // allow requests without origin (mobile apps, curl)
+    // allow server-to-server or curl
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
-
-      return callback(null, true);
-
+      callback(null, true);
     } else {
-
-      console.log('Blocked by CORS:', origin);
-
-      return callback(new Error('Not allowed by CORS'));
-
+      console.log("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
     }
 
   },
 
   credentials: true,
-
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-
   allowedHeaders: ['Content-Type','Authorization']
+};
 
-}));
+app.use(cors(corsOptions));
 
-
-// handle preflight globally
-app.options('*', cors());
-
-
-// ================= BODY PARSER =================
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-app.use(cookieParser());
-
-
-// ================= LOGGING =================
-
-if (process.env.NODE_ENV === 'development') {
-
-  app.use(morgan('dev'));
-
-}
-
-
-// ================= ROUTES =================
-
-app.get('/api/health', (req, res) => {
-
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString()
-  });
-
-});
-
-
-app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/timers', timerRoutes);
-
-
-// ================= ERROR HANDLER =================
-
-app.use(notFound);
-app.use(errorHandler);
-
-
-// ================= DATABASE =================
-
-const PORT = process.env.PORT || 5000;
-
-mongoose.connect(process.env.MONGODB_URI)
-
-  .then(() => {
-
-    console.log('✅ MongoDB connected');
-
-    app.listen(PORT, () => {
-
-      console.log(`🚀 Server running on port ${PORT}`);
-
-    });
-
-  })
-
-  .catch(err => {
-
-    console.error('❌ MongoDB connection failed:', err.message);
-
-    process.exit(1);
-
-  });
-
-
-module.exports = app;
+// IMPORTANT → preflight must use SAME options
+app.options('*', cors(corsOptions));

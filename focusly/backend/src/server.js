@@ -47,26 +47,36 @@ const allowedOrigins = [
   'https://focus-pqk27kkmw-ayush-singh0583-projects.vercel.app'
 ];
 
+// ================= CORS =================
+
 const corsOptions = {
-  origin: function (origin, callback) {
+  origin: function(origin, callback) {
 
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    // allow localhost
+    if (origin.includes("localhost"))
       return callback(null, true);
-    }
 
-    console.log("Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
+    // allow any vercel preview or production domain
+    if (origin.includes("vercel.app"))
+      return callback(null, true);
+
+    // allow custom domain if added later
+    if (origin === process.env.CLIENT_URL)
+      return callback(null, true);
+
+    console.log("Blocked CORS:", origin);
+
+    callback(new Error("Not allowed by CORS"));
+
   },
 
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  credentials: true
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 
 // ================= BODY =================

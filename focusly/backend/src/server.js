@@ -26,10 +26,13 @@ app.use(limiter);
 
 // CORS - allow frontend
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL,
-    'http://localhost:5173'
-  ],
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
+
+// allow preflight requests
+app.options('*', cors({
+  origin: process.env.CLIENT_URL,
   credentials: true
 }));
 

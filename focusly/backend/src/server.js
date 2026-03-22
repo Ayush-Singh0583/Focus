@@ -42,7 +42,9 @@ app.use(limiter);
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://focus-nu-topaz.vercel.app',
+  'https://focus-pqk27kkmw-ayush-singh0583-projects.vercel.app'
 ];
 
 const corsOptions = {

@@ -1,33 +1,41 @@
 import axios from 'axios'
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL + '/api', // IMPORTANT FIX
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 })
 
-// Response interceptor — handle auth errors globally
+
+// handle auth errors globally
 api.interceptors.response.use(
   res => res,
   err => {
+
     if (err.response?.status === 401) {
+
       localStorage.removeItem('focusly_user')
 
       if (
         !window.location.pathname.includes('/login') &&
         !window.location.pathname.includes('/register')
       ) {
+
         window.location.href = '/login'
+
       }
+
     }
 
     return Promise.reject(err.response?.data || err)
+
   }
 )
+
 
 // ── Auth ──────────────────────────────────────────────
 export const authApi = {
@@ -38,6 +46,7 @@ export const authApi = {
   updateMe: data => api.patch('/auth/me', data),
   changePassword: data => api.patch('/auth/password', data),
 }
+
 
 // ── Tasks ─────────────────────────────────────────────
 export const tasksApi = {
@@ -51,12 +60,14 @@ export const tasksApi = {
     api.patch(`/tasks/${taskId}/subtask/${subtaskId}`),
 }
 
+
 // ── Timers ────────────────────────────────────────────
 export const timersApi = {
   start: taskId => api.post(`/timers/${taskId}/start`),
   stop: taskId => api.post(`/timers/${taskId}/stop`),
   getActive: () => api.get('/timers/active'),
 }
+
 
 // ── Analytics ─────────────────────────────────────────
 export const analyticsApi = {

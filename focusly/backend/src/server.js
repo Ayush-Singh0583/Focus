@@ -19,64 +19,57 @@ const { errorHandler, notFound } = require('./middleware/error');
 const app = express();
 
 
+// ================= CORS (must be BEFORE helmet) =================
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    // allow localhost (any port)
+    if (origin.includes('localhost')) return callback(null, true);
+
+    // allow any Vercel preview / production domain
+    if (origin.includes('vercel.app')) return callback(null, true);
+
+    // allow the explicit CLIENT_URL from env
+    if (origin === process.env.CLIENT_URL) return callback(null, true);
+
+    console.log('Blocked CORS:', origin);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+// Handle preflight for ALL routes, then apply CORS globally
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+
+
 // ================= SECURITY =================
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  })
+);
 
 
 // ================= RATE LIMIT =================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200
+  max: 200,
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20
+  max: 20,
 });
 
 app.use('/api/auth', authLimiter);
 app.use(limiter);
-
-
-// ================= CORS =================
-
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-  'https://focus-nu-topaz.vercel.app',
-  'https://focus-pqk27kkmw-ayush-singh0583-projects.vercel.app'
-];
-
-// ================= CORS =================
-
-const corsOptions = {
-  origin: function(origin, callback) {
-
-    if (!origin) return callback(null, true);
-
-    // allow localhost
-    if (origin.includes("localhost"))
-      return callback(null, true);
-
-    // allow any vercel preview or production domain
-    if (origin.includes("vercel.app"))
-      return callback(null, true);
-
-    // allow custom domain if added later
-    if (origin === process.env.CLIENT_URL)
-      return callback(null, true);
-
-    console.log("Blocked CORS:", origin);
-
-    callback(new Error("Not allowed by CORS"));
-
-  },
-
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 
 // ================= BODY =================

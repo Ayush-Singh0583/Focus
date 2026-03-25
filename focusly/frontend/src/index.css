@@ -4,12 +4,28 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
   body {
     @apply bg-surface-100 dark:bg-surface-950 text-surface-900 dark:text-white;
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  #root {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
   }
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }

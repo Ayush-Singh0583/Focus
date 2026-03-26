@@ -1,4 +1,4 @@
-name: Deploy Frontend to GitHub Pages
+name: Deploy Vite React to GitHub Pages
 
 on:
   push:
@@ -11,12 +11,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "github-pages"
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build Frontend
     runs-on: ubuntu-latest
 
     defaults:
@@ -24,27 +23,26 @@ jobs:
         working-directory: focusly/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install   # use install instead of ci
+        run: npm install
 
-      - name: Build website
+      - name: Build Vite app
         run: npm run build
 
-      - name: Upload Pages artifact
+      - name: Upload build files
         uses: actions/upload-pages-artifact@v3
         with:
           path: focusly/frontend/dist
 
   deploy:
-    name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
 
@@ -53,6 +51,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Deploy
+      - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4

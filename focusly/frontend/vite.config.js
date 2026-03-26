@@ -3,9 +3,11 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+
+  base: '/Focus/',   // MUST be outside server
+
   server: {
     port: 5173,
-    base: '/Focus/',
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
@@ -9,8 +8,8 @@ dist/
 build/
 
 # Env files
-.env
-.env.*
+backend/.env
+backend/.env.*
 !.env.example
 
 # Logs

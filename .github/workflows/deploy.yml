@@ -22,6 +22,9 @@ jobs:
       run:
         working-directory: focusly/frontend
 
+    env:
+      VITE_API_URL: https://focus-1-rces.onrender.com
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4

@@ -21,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: focusly/frontend   # IMPORTANT
+        working-directory: focusly/frontend
 
     steps:
       - name: Checkout repository
@@ -31,11 +31,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: focusly/frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install   # use install instead of ci
 
       - name: Build website
         run: npm run build
@@ -43,7 +41,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: focusly/frontend/dist   # Vite build output
+          path: focusly/frontend/dist
 
   deploy:
     name: Deploy to GitHub Pages

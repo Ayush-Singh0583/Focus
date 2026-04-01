@@ -13,6 +13,7 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
 import LoadingScreen from './components/ui/LoadingScreen'
 import TimetablePage from './pages/TimetablePage'
+import PermissionsPage from './pages/PermissionsPage'
 function ProtectedRoute({ children }) {
   const { user, loading, initialized } = useAuth()
   if (!initialized || loading) return <LoadingScreen />
@@ -30,6 +31,7 @@ function PublicRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/permissions" element={<PermissionsPage />} />
       <Route path="/timetable" element={<TimetablePage />} />
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />

@@ -35,7 +35,7 @@ const corsOptions = {
     // allow the explicit CLIENT_URL from env
     if (origin === process.env.CLIENT_URL) return callback(null, true);
 
-    console.log('Blocked CORS:', origin);
+      console.log('Blocked CORS:', origin);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
